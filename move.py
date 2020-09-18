@@ -1,9 +1,10 @@
 import numpy as np
-import board2
+import board
 import random
 
 def user_move():
-    move = input("turn snake up(w), down(s), left(a), right(d), or no change (n): ")
+    move = input("turn snake up(w), down(s), left(a), right(d)"
+        + ",or no change (n): ")
     return move
 
 def update_direct(direct_change, direct):
@@ -26,8 +27,7 @@ def update_direct(direct_change, direct):
         "westd": "west"
     }
     new_direct = direct
-    #find a better way to say( if anythig  typed in besides u,d,l,r change nothing)
-    if (direct_change != "") and (direct_change in "wasd"):
+    if not direct_change and direct_change in "wasd":
         new_direct = changes[direct + direct_change]
 
     return new_direct
@@ -105,12 +105,12 @@ def movement(dimen, pos_mat, direct_change, direct, snake_pos, apple_pos, grow):
         #print("Game over")
         return "quit"
         
-    new_board_mat = update_mat_full(dimen, new_snake_pos, apple_pos)
+    new_board_mat = update_mat_full(dimen, new_snake_pos, new_apple_pos)
     return (new_board_mat, new_direct, new_snake_pos, new_apple_pos, new_grow)
 
 
 def print_board_stuff(move_data):
-    #print(move_data[0])
+    print(move_data[0])
     print(board2.make_board(move_data[0]))
     #print("the snake is currently going " + move_data[1])
     #print("the snakes position is :")
@@ -127,7 +127,7 @@ def game(dimen=(5,5)):
     apple_pos = apple_picker(dimen, snake_pos)
 
     #temp reseting data to add apple to initial board data
-    #maybe its a waste to fully rebuild the board each time
+    #maybe its a waste to fully rebuild the board data each time
     board_mat = update_mat_full(dimen, snake_pos, apple_pos)
 
     #maybe make this a dictionary so you can easily understand in functions?
@@ -138,7 +138,8 @@ def game(dimen=(5,5)):
     i=0
     while i<600:
         direct_change = user_move()
-        move_data = movement(dimen, move_data[0], direct_change, move_data[1], move_data[2], move_data[3], move_data[4])
+        move_data = movement(dimen, move_data[0], direct_change, move_data[1], 
+            move_data[2], move_data[3], move_data[4])
         if move_data == "quit":
             break
         print_board_stuff(move_data)
@@ -147,4 +148,4 @@ def game(dimen=(5,5)):
 
     print("Thanks for playing")
 if __name__ == "__main__":
-    game((10,10))
+    game()
