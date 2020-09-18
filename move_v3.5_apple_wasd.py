@@ -3,31 +3,31 @@ import board2
 import random
 
 def user_move():
-    move = input("turn snake up(u), down(d), left(l), right(r), or no change (n): ")
+    move = input("turn snake up(w), down(s), left(a), right(d), or no change (n): ")
     return move
 
 def update_direct(direct_change, direct):
     changes = {
-        "northu": "north",
-        "northd": "north",
-        "northl": "west",
-        "northr": "east",
-        "eastu": "north", 
-        "eastd": "south", 
-        "eastl": "east",       
-        "eastr": "east",
-        "southu": "south",
-        "southd": "south",
-        "southl": "west",
-        "southr": "east",
-        "westu": "north",
-        "westd": "south",
-        "westl": "west",
-        "westr": "west"
+        "northw": "north",
+        "norths": "north",
+        "northa": "west",
+        "northd": "east",
+        "eastw": "north", 
+        "easts": "south", 
+        "easta": "east",       
+        "eastd": "east",
+        "southw": "south",
+        "souths": "south",
+        "southa": "west",
+        "southd": "east",
+        "westw": "north",
+        "wests": "south",
+        "westa": "west",
+        "westd": "west"
     }
     new_direct = direct
     #find a better way to say( if anythig  typed in besides u,d,l,r change nothing)
-    if (direct_change != "") and (direct_change in "udlr"):
+    if (direct_change != "") and (direct_change in "wasd"):
         new_direct = changes[direct + direct_change]
 
     return new_direct
@@ -77,7 +77,6 @@ def change_pos(dimen, direct, snake_pos, grow):
     new_snake = np.insert(new_snake,0 , snake_head, axis = 0)
     return(new_snake, grow)
 
-#here homie, a
 def apple_picker(dimen, new_snake_pos):
     board_mat = update_mat_snake(dimen, new_snake_pos)
     open_raw = np.where(board_mat == 0)
@@ -85,26 +84,37 @@ def apple_picker(dimen, new_snake_pos):
 
     return random.choice(open_pos)
 
+def snake_killer(dimen, new_snake_pos):
+    board_mat = update_mat_snake(dimen, new_snake_pos)
+
+    return np.where(board_mat == 2)[0].size == 0
+
 def movement(dimen, pos_mat, direct_change, direct, snake_pos, apple_pos, grow):
     new_direct = update_direct(direct_change, direct)
     snake_grow = change_pos(dimen, new_direct, snake_pos, grow)
     new_snake_pos = snake_grow[0]
     new_grow = snake_grow[1]
     new_apple_pos = apple_pos
+    
+    #growth condition checker
     if (new_snake_pos[0, 0], new_snake_pos[0, 1]) == apple_pos:
         new_grow = True
         new_apple_pos = apple_picker(dimen, new_snake_pos)
-        print("Fuck yeah")
+    
+    if snake_killer(dimen, new_snake_pos):
+        #print("Game over")
+        return "quit"
+        
     new_board_mat = update_mat_full(dimen, new_snake_pos, apple_pos)
     return (new_board_mat, new_direct, new_snake_pos, new_apple_pos, new_grow)
 
 
 def print_board_stuff(move_data):
-    print(move_data[0])
+    #print(move_data[0])
     print(board2.make_board(move_data[0]))
-    print("the snake is currently going " + move_data[1])
-    print("the snakes position is :")
-    print(move_data[2])
+    #print("the snake is currently going " + move_data[1])
+    #print("the snakes position is :")
+    #print(move_data[2])
 
 def game(dimen=(5,5)):
     #defining initial values for variables
@@ -126,12 +136,15 @@ def game(dimen=(5,5)):
     print_board_stuff(move_data)   
 
     i=0
-    while i<100:
+    while i<600:
         direct_change = user_move()
         move_data = movement(dimen, move_data[0], direct_change, move_data[1], move_data[2], move_data[3], move_data[4])
+        if move_data == "quit":
+            break
         print_board_stuff(move_data)
 
         i += 1
 
+    print("Thanks for playing")
 if __name__ == "__main__":
-    game()
+    game((10,10))
